@@ -1,0 +1,18 @@
+/* 改变脚本图标大小 */
+/*toolbar buttons*/
+.toolbarbutton-1 > .toolbarbutton-icon {
+	fill: #a1b5ce !important;
+	transform: scale(.8,.8) !important;
+}
+  
+.toolbarbutton-1:hover {
+	fill: #00DDFF !important;
+}
+  
+.toolbarbutton-1[open="true"] {
+	fill: #00DDFF !important;
+}
+  
+.toolbarbutton-1[disabled] {
+	fill: #a1b5ce !important;
+}

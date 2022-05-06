@@ -1,0 +1,12 @@
+/* Focused tabs */
+.tab-content[selected="true"] {
+  color: #FF00E6 !important;
+}
+
+/* Unfocused tabs */
+/*
+.tab-content {
+  font-size: 2em !important;
+  color: #ffffff !important;
+}
+*/

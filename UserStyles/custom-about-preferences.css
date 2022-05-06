@@ -1,0 +1,95 @@
+/*START 04=============================================选项页面 about:preferences===========================================*/
+
+@-moz-document url(about:preferences),url-prefix(about:preferences) {
+
+  /* 隐藏“您的浏览器由组织管理” */
+  #policies-container {display:none !important;
+ }
+
+  .main-content {
+		font-size: 14px !important;
+	}
+	
+  .sidebar-footer-button {
+		font-size: 13px !important;
+	}
+	
+
+	#categories {
+		width: 170px;
+		margin-left: 34px;
+	}
+
+	#categories .category-name {
+		font-size: 12px !important;
+		padding-left: 15px !important;
+	}
+
+	#categories .category-icon {
+		margin-left: 7px;
+	}
+
+	#categories richlistitem {
+		height: 55px;
+	}
+
+
+/*分类图标定义*/
+	.category-icon {
+		width: 36px !important;
+		height: 36px !important;
+		transition-duration: 0.3s;
+		transition-timing-function: ease;
+	}
+
+
+
+
+  /*分类图标定义*/
+	/*General*/
+	#category-general > .category-icon {
+		list-style-image: url("../images/category-general.png") !important;
+	}
+
+  /*Home*/
+	#category-home > .category-icon {
+		list-style-image: url("../images/category-content.png") !important;
+	}
+
+	/*Search*/
+	#category-search > .category-icon {
+		list-style-image: url("../images/category-search.png") !important;
+	}
+
+	/*内容*/
+	#category-content > .category-icon {
+		list-style-image: url("../images/category-content.png") !important;
+	}
+
+	/*应用程序*/
+	#category-application > .category-icon {
+		list-style-image: url("../images/category-application.png") !important;
+	}
+
+	/*Pricacy*/
+	#category-privacy > .category-icon {
+		list-style-image: url("../images/category-privacy.png") !important;
+	}
+
+	/*Security*/
+	#category-security > .category-icon {
+		list-style-image: url("../images/category-security.png") !important;
+	}
+
+	/*Sync*/
+	#category-sync > .category-icon {
+		list-style-image: url("../images/category-sync.png") !important;
+	}
+
+	/*高级*/
+	#category-advanced > .category-icon {
+		list-style-image: url("../images/category-advanced.png") !important;
+	}
+  /*隐藏更新按钮*/
+    #checkForUpdatesButton {display: none !important;}
+  }

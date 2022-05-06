@@ -1,0 +1,55 @@
+/*START 02======================================源代码样式 ViewResouce Style=====================================*/
+
+
+@-moz-document url-prefix(view-source:) {
+
+	*|*:root {
+		background: #272822 !important;
+	}
+
+  #viewsource {
+    height: auto !important;
+  }
+
+	*::-moz-selection {
+		background-color: #49483E;
+	}
+
+	body {
+		font: 12px JetBrains Mono, monospace, -moz-fixed !important;
+		margin: 0;
+		padding: 0.6em 1em;
+		color: #FCFFE0 !important;
+	}
+
+	.doctype, .start-tag, .end-tag {
+		color: #06cfcf !important;
+	}
+
+	.attribute-name {
+		color: #a0a0f0 !important;
+		font-weight: normal !important;
+	}
+
+	.attribute-value {
+		color: white !important;
+	}
+
+	.comment, .cdata, .pi {
+		color: green !important;
+	}
+
+	.error, .error > .start-tag, .error > .end-tag,
+  .error > .comment, .error > .cdata, .error > .doctype,
+  .error > .pi, .error > .entity, .error > .attribute-name,
+  .error > .attribute-value {
+		color: red !important;
+		background: #fff !important;
+		font-weight: bold !important;
+	}
+
+	a:link {
+		color: #8fa3ff !important;
+	}
+
+}

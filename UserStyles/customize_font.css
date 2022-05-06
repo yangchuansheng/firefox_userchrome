@@ -1,0 +1,19 @@
+/*  Styles for Web developer tools and code */
+.devtools-monospace,
+.CodeMirror,
+.CodeMirror pre,
+code, pre {
+	font-family: JetBrains Mono, monospace !important;
+}
+
+body,
+.std, .g,
+h1, h2, h3, h4, h5,
+a, div, li,
+strong, b,
+#navigator-toolbox,
+.title,
+.t2vtad
+{
+	font-family: Roboto, "LXGW WenKai", sans-serif !important;
+}

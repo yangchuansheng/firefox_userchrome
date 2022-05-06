@@ -1,0 +1,952 @@
+/*@name        SimpleWhite For Firefox 70+
+  @author      RunningCheese
+  @homepage    https://www.runningcheese.com
+  @reference   Inspired by Simplewhite Theme and QQ Browser
+
+  @version     v2020-07-04
+  @version     v2019-09-25
+  @version     v2018-06-17
+  @version     v2018-04-29
+*/
+
+
+
+
+
+/*隐藏微博图床标题*/
+@-moz-document url(moz-extension://4c0faf8b-9384-4f1d-bf4a-08f0fb2569f4/pages/tuchuang.html) {
+	#title {
+		display: none !important
+	}
+}
+
+
+
+/*START 01=====================================阅读辅助 Reading Font=====================================*/
+/*输入框字体 InputBox Font*/
+.textbox-input-box,.searchbar-textbox {
+	font-family: Tahoma,LXGW WenKai, Arial,Helvetica, sans-serif !important;
+}
+ 
+/*下拉框输入框字体 Dropdown Font*/
+select,textarea,input {
+	font-family: Tahoma,LXGW WenKai, Arial, Helvetica, sans-serif !important;
+}
+
+
+/*--------文档阅读样式 Document reading style---------*/
+@-moz-document regexp(".*\.(t|T)(x|X)(t|T)|.*\.(c|C)(s|S)(s|S)|.*\.(i|I)(n|N)(i|I)|.*\.(l|L)(o|O)(g|G)|.*\.(j|J)(s|S)|.*\.(j|J)(s|S)(o|O)(n|N)|.*\.(b|B)(a|A)(t|T)|.*\.(p|P)(y|Y)|.*\.(s|S)(h|H)|.*\.(p|P)(e|E)(m|M)|.*\.(l|L)(r|R)(c|C)") {
+
+	html > body:not([bgcolor]) {
+		background-color: #F9F9FA !important;
+	}
+
+	html > body:not([bgcolor]) > pre {
+		width: 55% !important;
+		margin: 40px auto !important;
+		padding: 25px !important;
+		white-space: pre-wrap !important;
+		font-size: 14px !important;
+		color: #000 !important;
+		line-height: 25px !important;
+	}
+}
+
+
+/*--------Markdown阅读样式---------*/
+@-moz-document regexp(".*\.(m|M)(d|D)") {
+
+	.wiki{
+		max-width: 760px !important;
+		margin: auto !important;
+		font-size: 15px;
+}
+}
+
+
+
+/*START 02======================================源代码样式 ViewResouce Style=====================================*/
+
+
+@-moz-document url-prefix(view-source:) {
+
+	*|*:root {
+		background: #272822 !important;
+	}
+
+#viewsource {
+  height: auto !important;
+}
+
+	*::-moz-selection {
+		background-color: #49483E;
+	}
+
+	body {
+		font: 12px Monaco, -moz-fixed !important;
+		margin: 0;
+		padding: 0.6em 1em;
+		color: #FCFFE0 !important;
+	}
+
+	.doctype, .start-tag, .end-tag {
+		color: #06cfcf !important;
+	}
+
+	.attribute-name {
+		color: #a0a0f0 !important;
+		font-weight: normal !important;
+	}
+
+	.attribute-value {
+		color: white !important;
+	}
+
+	.comment, .cdata, .pi {
+		color: green !important;
+	}
+
+	.error, .error > .start-tag, .error > .end-tag,
+.error > .comment, .error > .cdata, .error > .doctype,
+.error > .pi, .error > .entity, .error > .attribute-name,
+.error > .attribute-value {
+		color: red !important;
+		background: #fff !important;
+		font-weight: bold !important;
+	}
+
+	a:link {
+		color: #8fa3ff !important;
+	}
+}
+
+
+
+
+
+
+/*START 03==============================================附加组件栏 about:addons============================================*/
+@-moz-document url-prefix(chrome://mozapps/content/extensions/aboutaddons.html), url(about:addons),url-prefix(about:addons)	{
+
+	
+	
+/**** 左侧  选项切换 ****/
+.sidebar-footer-link{
+	font-size: 12px !important;
+	margin-left:35px; }
+	
+
+/*分类项样式*/
+	.category {
+		height: 55px !important;
+		padding-left: 60px !important;
+	}
+
+
+/*隐藏项样式*/
+	.category[hidden="true"], .category[disabled="true"] {
+		display: none !important;
+	}
+	
+	
+/*分类名*/
+	.category-name {
+		padding-left: 6px;
+		font-size: 12px !important;
+		display: block !important;
+	}
+
+	
+/*分类图标定义*/
+	.category-icon {
+		width: 36px !important;
+		height: 36px !important;
+		-moz-margin-start: 0px !important;
+		transition-duration: 0.3s;
+		transition-timing-function: ease;
+	}
+
+.category[selected="true"] .category-icon,
+.category:hover .category-icon {
+		opacity: 1 !important;
+	}
+
+	.category:hover .category-icon {
+		margin-left: -8px !important;
+	}
+
+
+
+
+	
+/****分类图标定义****/
+	
+/*搜索附加组件*/
+	#category-search > .category-icon {
+		list-style-image: url("../images/category-search.png") !important;
+	}
+	
+/*获取附加组件*/
+	.category{
+			background-repeat:no-repeat !important;
+	  	background-size:36px !important;
+	  	background-position: 10% 50% !important;
+	}
+	
+	.category[name="discover"] {
+		background-image: url("../images/category-discover.png") !important;
+	}
+
+/*扩展*/
+	.category[name="extension"] {
+		background-image:url("../images/category-extension.png") !important;
+	}
+	
+/*外观*/
+	.category[name="theme"] {
+		background-image: url("../images/category-theme.png") !important;
+	}
+
+/*插件*/
+	.category[name="plugin"] {
+		background-image: url("../images/category-plugin.png") !important;
+	}
+	
+/*字典*/
+	.category[name="dictionary"] {
+		background-image: url("../images/category-locale.png") !important;
+	}
+
+/*语言*/
+	.category[name="locale"] {
+		background-image: url("../images/category-locale.png") !important;
+	}
+
+/*uc脚本*/
+	.category[name="userchromejs"] {
+		background-image: url("../images/category-userchromejs.png") !important;
+	}
+
+/*可用更新*/
+		.category[name="available-updates"] {
+		background-image: url("../images/category-availableUpdates.png") !important;
+	}
+
+/*最近更新*/
+	.category[name="recent-updates"] {
+		background-image: url("../images/category-recentUpdates.png") !important;
+	}
+
+	#header-utils-btn dropmarker {
+		display: block !important;
+	}
+	
+/*数字提醒*/
+.category-badge {
+padding: 2px 6px !important;
+font-weight: normal !important;
+font-size: 12px !important;
+}
+
+
+	
+/***** 右侧 #header**** */
+/* 检查更新按钮和搜索框*/
+	#header {
+		margin-top: 2px !important;
+		margin-bottom: 4px !important;
+		font-size: 12px !important;
+	}
+	
+.main-search {height:20px !important;}
+	
+.header-name{font-size: 18px !important;}
+	
+.sticky-container {	 z-index: 100 !important;	}
+	
+/* 检查更新按钮*/
+	#header-utils-btn {
+		background: none !important;
+		border: none !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		padding: 4px 0 !important;
+		cursor: pointer;
+	}
+
+/*搜索框*/
+	#header-search {
+		height: 22px !important;
+	}
+
+/*隐藏旧式拓展提醒*/
+	#legacy-extensions-notice {
+		display: none !important;
+	}
+
+	#header-search {
+		background-color: #fff !important;
+	}
+
+
+/*列表顶部信息栏*/
+	.view-header,#update-actions {
+		margin: 0 !important;
+		padding: 0 !important;
+		min-height: 2px !important;
+		background: none !important;
+		border-bottom: 1px solid rgb(204,204,204) !important;
+	}
+	
+/*列表顶部信息栏按钮*/
+	.view-header .addon-control {
+		background: none !important;
+		border: none !important;
+	}
+	
+/*列表顶部信息栏排序按钮*/
+	.view-header .sorter {
+		margin: 0 !important;
+		padding: 0 !important;
+		background: none !important;
+		color: rgb(66, 66, 66) !important;
+		border: none !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		border-left: 1px solid rgb(204,204,204) !important;
+		cursor: pointer;
+	}
+
+	.view-header .sorter .box-inherit.button-box {
+		padding: 4px 9px !important;
+	}
+
+	.view-header .sorter[checkState="2"] {
+		background: rgb(242,242,242) !important;
+	}
+
+/*文字修改*/
+/*
+	.name-container {
+		font-weight: normal!important;
+		font-family: Microsoft YaHei!important;
+		color: #000 !important;
+	}
+*/
+
+	.name-container>.disabled-postfix {
+		color: #999 !important;
+	}
+	
+	
+/*========列表 .list========*/
+/*列表所有项目放到同一行*/
+	#main .card {
+		margin: 8px auto !important;
+		position: relative !important;
+	}
+	
+
+	#main .card .addon-description {
+		font-size: 13px !important;
+	}
+
+	#main .card .addon-name{
+		font-size: 13px !important;
+	}
+	
+	
+addon-card:not([expanded="true"]) .card-heading-icon {
+	  margin-inline-end: 2px !important;
+	}
+
+addon-card:not([expanded="true"]) .card-heading-image {
+	  display: none !important;
+	}
+	
+
+[class="toggle-button extension-enable-button"] { margin-right:14px !important;}
+
+addon-list panel-item{margin: -2px 4px 0 4px  !important;	}
+	
+panel-list [data-l10n-id="preferences-addon-button"]
+{margin: -7px 8px 0 0px  !important;}
+	
+panel-list [data-l10n-id="remove-addon-button"]
+{margin: -3px 8px 0 0px  !important;	}
+
+[role="menuitem"]
+	{
+		background: transparent !important;
+	}
+	 
+	
+/*列表按钮*/
+	.addon.addon-view .status-control-wrapper {
+		position: absolute !important;
+		right: 12px;
+		top: -1px;
+	}
+	
+/*列表图标大小*/
+	#main .card .addon-icon {
+	height: 16px !important;
+	width: 16px !important;
+	margin-right:10px !important;
+	}
+
+/*隐藏拓展描述*/
+	addon-card:not([expanded]) .addon-description,
+  addon-card:not([expanded]) .addon-card-message button[action]{ display: none !important; }
+
+	
+/*显示描述信息*/
+	.addon.addon-view:hover .description-outer-container {
+/*选中*/
+		display: -moz-box !important;
+	}
+
+	.addon.addon-view[pending] .pending {
+/*禁用*/
+		margin-left: 0 !important;
+	}
+
+	.addon.addon-view[selected][pending] .pending {
+/*选中并禁用*/
+		margin-left: -1px !important;
+	}
+
+	.addon.addon-view[pending] .description-outer-container {
+/*禁用*/
+		display: none !important;
+	}
+
+/*选项背景*/
+	#view-port .addon {
+		background: #fff !important;
+	}
+/*悬停项背景*/
+	#view-port .addon:hover {
+		background: #d8f4e5 !important;
+	}
+/*禁用项背景*/
+	.addon.addon-view[active="false"]:not([notification="warning"] ) {
+		background: rgb(255,255,255) !important
+	}
+/*选中项背景*/
+	#view-port .addon[selected] {
+		background-color: #d8f4e5 !important;
+	}
+
+	
+/*=================拓展图标修改=================*/
+
+/*将拓展选项内容重新列出来*/
+/*
+link:-moz-any([href$="panel-item.css"],[href$="panel-list.css"]) ~ button {
+	  width: unset !important;
+	  padding: 2px 5px !important;
+		width: 16px !important;
+	  height: 16px !important;
+	}
+*/
+	
+link:-moz-any([href$="panel-item.css"],[href$="panel-list.css"]) ~ button {
+    cursor: pointer !important;
+}
+	
+[data-l10n-id="addon-options-button"] {visibility: hidden !important;	}
+panel-item {--icon: unset !important;	}
+
+:-moz-any(plugin-options, addon-options) > panel-list {
+	  display:block !important;
+	  overflow: hidden !important;
+	  right: 0px !important;
+	  left: unset !important;
+	  top: 4px;
+		right:4px !important;
+	  box-shadow: none !important;
+	  background: unset !important;
+	  border: unset !important;
+	  box-shadow: unset !important;
+	  min-width: unset !important;
+	  width: unset !important;
+	}
+
+
+
+	div.arrow.top ~ div.list {
+	  display: flex !important;
+	  justify-content: end;
+	}
+
+	panel-list{z-index: 99 !important;}
+	
+	
+	panel-item[action="preferences"] {
+	  order: -1;
+	}
+	
+	panel-item[badged] {
+	  border: 1px solid Highlight !important;
+	}
+
+	link:-moz-any([href$="panel-item.css"],[href$="panel-list.css"]) ~ button::after {
+	  display: none !important;
+	}
+
+	
+	html { --addon-page-options-width: 320px;	}
+	
+
+	div.arrow.top + div.list {
+	  display: flex !important;
+	  flex-flow: row wrap !important;
+	  justify-content: flex-start !important;
+	}
+
+
+	addon-page-options panel-list {
+	  min-width: unset !important;
+	  width: auto !important;
+	  max-width: var(--addon-page-options-width) !important;
+	  z-index: 1000 !important;
+	}
+	
+	addon-page-options panel-list panel-item {
+	  min-width: calc(var(--addon-page-options-width) - 20px) !important;
+	  width: 320px !important;
+	}
+		
+
+	
+	
+	
+	
+
+/* 鼠标经过时才显示
+	.addon.card:not(:hover) .more-options-menu panel-list {
+	  display: none !important;
+	  visibility: hidden !important;
+}
+*/
+	
+/*选项图标修改*/
+	link:-moz-any([href$="panel-item.css"],[href$="panel-list.css"]) ~ button slot {
+	  visibility: hidden !important;
+	}
+
+	panel-item[action="toggle-disabled"][data-l10n-id="disable-addon-button"] {
+	  background: url("../images/icons/addon-disable.png") no-repeat center !important;
+		width: 40px !important;
+		padding:0 10px !important;
+		height:16px !important;
+	}
+	
+	panel-item[action="toggle-disabled"][data-l10n-id="enable-addon-button"] {
+	  background: url("../images/icons/addon-enable.png") no-repeat center !important;
+		width: 40px !important;
+		padding:0 10px !important;
+		height:16px !important;
+	}
+	
+	panel-item[data-l10n-id="remove-addon-button"] {
+	  background: url("../images/icons/addon-remove.png") !important;
+		width: 16px !important;
+	  height:16px !important;
+	}
+
+
+	panel-item[data-l10n-id="install-update-button"] {
+	  background:url("chrome://global/skin/icons/update-icon.svg") !important;
+		width: 16px !important;
+		height:16px !important;
+		border:none !important;
+		margin-left:6px !important;
+	}
+	
+	panel-item[data-l10n-id="preferences-addon-button"] {
+	 	background:url("../images/icons/addon-preferences.png") no-repeat center !important;
+		width: 16px !important;
+	  height:16px !important;
+		padding:4px 0px !important;
+	}
+	
+/*深色主题颜色反转*/
+	@media (prefers-color-scheme: dark)	{
+		panel-item[data-l10n-id="remove-addon-button"],
+		panel-item[data-l10n-id="preferences-addon-button"]{
+		filter: invert(1) !important;
+	}
+	}
+
+	
+	panel-item[data-l10n-id="report-addon-button"] {
+	  background: url("chrome://global/skin/icons/warning.svg") !important;
+		width: 16px !important;
+	}
+	
+	panel-item[data-l10n-id="ask-to-activate-button"] {
+	  background: url("../images/icons/addon-disable.png") no-repeat center !important;
+		width: 40px !important;
+		padding:0 10px !important;
+		height:16px !important;
+	}
+	
+	panel-item[data-l10n-id="always-activate-button"] {
+	 	background: url("../images/icons/addon-disable.png") !important;
+		width: 40px !important;
+		height:16px !important;
+	}
+	
+	panel-item[data-l10n-id="never-activate-button"] {
+	 	background: url("../images/icons/addon-remove.png") !important;
+		width: 16px !important;
+		height:16px !important;
+	}
+	
+/*启用禁用按钮颜色调整*/
+input[type="checkbox"].toggle-button:checked {
+  background: #1890ff !important;
+  border-color:#3478f6 !important;
+}
+input[type="checkbox"].toggle-button:checked:hover {
+  background: #3478f6 !important;
+  border-color: var(--in-content-primary-button-background-active);
+}
+	
+
+/*原生启用禁用按钮*/
+input[type="checkbox"].toggle-button {
+  --button-width: 40px !important;
+  --dot-transform-x: 24px !important;
+	--dot-size: 14px !important;
+  --dot-margin: 0px !important;
+}
+
+
+	
+	
+/*隐藏报告和更多按钮*/
+panel-item[action="report"],
+panel-item[action="expand"],
+[data-l10n-id="remove-addon-disabled-button"]
+{display: none !important;	}
+	
+link:-moz-any([href$="panel-item.css"],[href$="panel-list.css"]) ~ button label:not([accesskey]) {
+	  visibility: hidden !important;
+}
+	
+	
+/*========详细面板#detail-view========*/
+/*详细面板按钮样式*/
+	#detail-view #detail-controls button {
+	}
+
+/*========更新面板#updates-view========*/
+/*安装选中的更新&立即更新*/
+	#updates-view #update-selected-btn {
+		background: none !important;
+		color: rgb(66, 66, 66) !important;
+		border: none !important;
+		border-radius: 0 !important;
+		border: 1px solid rgb(204,204,204) !important;
+	}
+
+
+/*隐藏兼容检查警告*/
+	.view-header.global-warning-container,.global-warning-container.global-warning,.addon.addon-view .warning {
+		display: none!important;
+	}
+/*隐藏作者*/
+	#search-list .creator,#addon-list .creator,#updates-list .creator {
+		display: none !important;
+	}
+/*进度条*/
+	.download-progress {
+		background-image: none !important;
+	}
+
+	.progress-bar {
+		-moz-appearance: none !important;
+		background: -moz-repeating-linear-gradient(0 -45deg,#48A 0px,#89F 5px,#FAFAFA 5px,#FAFAFA 10px) !important;
+	}
+
+	.progress-remainder {
+		-moz-appearance: none !important;
+		background: #FFF !important;
+	}
+
+	progressmeter {
+		-moz-appearance: none !important;
+		border: 1px solid #99B !important;
+		box-shadow: 0 0 4px -1px #49F;
+	}
+/*隐藏底部信息*/
+	#userstyle-footer {
+		display: none !important;
+	}
+	
+/*隐藏水平滚动条*/
+	#view-port-container #view-port scrollbox {
+		overflow-x: hidden!important
+}
+	
+
+/* 显示ID*/
+/*.addon[selected="true"]::after {
+    content: " ID : " attr(value) !important;
+    margin-left: 30px !important;
+    color: red !important;
+    cursor: default;}*/
+
+	
+/*隐藏附加组件管理器里的"显示发行说明"选项*/
+	.relnotes-toggle {
+		opacity: 0 !important;
+	}
+	
+/*隐藏拓展版本信息*/
+	.name-container .version {
+		display: none !important;
+	}
+	
+/*隐藏信息提示*/
+	#getthemes-container, #plugindeprecation-notice {
+		display: none !important;
+	}
+	
+
+	
+/* Firefox 64+ 改变更新 */
+	#heading,
+	#list-view-heading {
+	  margin-top: unset !important;
+	  margin-bottom: unset !important;
+	  margin-inline-start: unset !important;
+	  min-width: 100% !important;
+	  margin-top: -32px !important;
+	}
+
+
+/* tweaks for small windows */
+	@media (max-width: 830px) {
+	  
+		#header-inner {
+		  margin: unset !important;
+		  width: calc(100vw - 116px) !important;
+		}
+		
+		#heading #updates-container {
+		  display: none !important;
+		}
+	}
+	
+	
+	#list-view-heading-name {
+	  visibility: hidden !important;
+	}
+	
+	#show-all-extensions,
+	#heading-name,
+	#header-inner #search-label{
+	  display: none !important;
+	}
+
+	#header-search {
+		margin-bottom:-10px !important;
+	  min-width: 200px !important;
+	  width: unset !important;
+	}
+	
+	#header-search .textbox-input {
+	  font-size: 0.96em !important;
+	}
+	
+	#header-inner button,
+	#header-inner button .button-box {
+	  margin: 0 !important;
+	  padding: 0 !important;
+	}
+	
+	
+	.message-bar {
+	  background-color: white !important;
+	}
+	
+	.addon {
+	  padding-top: 6px !important;
+	  padding-bottom: 3px !important;
+	}
+
+	.addon.card {
+	  max-width: unset !important;
+	}
+
+	.list-view-heading-inner {
+	  -moz-box-flex: 1 !important;
+	  width: unset !important;
+	}
+
+	.list > .addon {
+	  margin: unset !important;
+	}
+
+	.list > .addon,
+	.list > .addon:hover {
+	  outset: unset !important;
+	  box-shadow: unset !important;
+	  duration: unset !important;
+	  border-bottom: 1px solid var(--in-content-box-border-color) !important;
+	}
+
+	.sidebar-footer-button .text-link {
+	  margin-inline-start: 0 !important;
+	}
+	
+	#detail-view .card {
+	  outset: unset !important;
+	  box-shadow: unset !important;
+	  duration: unset !important;
+		margin-left:-3px !important;
+	}
+
+	#detail-view .detail-view-container {
+	  width: calc(100vw - 270px) !important;
+		margin-top:-10px !important;
+	}
+
+	#detail-view .detail-view-wrapper > spacer {
+	  display: none !important;
+	}
+
+
+	
+	/* 搜索 */
+	#header-search {
+	  min-width: 210px !important;
+	  border-radius: 6px !important;
+	}
+
+	
+/* Firefox 67+ 改变更新 */
+	
+.message-bar {display: none !important;}
+[class="description privateBrowsing-notice"] {display: none !important;}
+#preferencesButton {font-size: 12px;}
+[class="card addon-detail"]{max-width:1200px;margin-right:20px !important;}
+
+	
+
+	
+}
+
+
+
+
+
+
+/*START 04=============================================选项页面 about:preferences===========================================*/
+
+@-moz-document url(about:preferences),url-prefix(about:preferences) {
+
+/* 隐藏“您的浏览器由组织管理” */
+#policies-container {display:none !important;
+}
+
+.main-content {
+		font-size: 14px !important;
+	}
+	
+.sidebar-footer-button {
+		font-size: 13px !important;
+	}
+	
+
+	#categories {
+		width: 170px;
+		margin-left: 34px;
+	}
+
+	#categories .category-name {
+		font-size: 12px !important;
+		padding-left: 15px !important;
+	}
+
+	#categories .category-icon {
+		margin-left: 7px;
+	}
+
+	#categories richlistitem {
+		height: 55px;
+	}
+
+
+/*分类图标定义*/
+	.category-icon {
+		width: 36px !important;
+		height: 36px !important;
+		transition-duration: 0.3s;
+		transition-timing-function: ease;
+	}
+
+
+
+
+/*分类图标定义*/
+	#category-general > .category-icon {
+/*常规*/
+		list-style-image: url("../images/category-general.png") !important;
+	}
+
+/*主页*/
+		#category-home > .category-icon {
+		list-style-image: url("../images/category-content.png") !important;
+	}
+
+	#category-search > .category-icon {
+/*搜索*/
+		list-style-image: url("../images/category-search.png") !important;
+	}
+
+	#category-content > .category-icon {
+/*内容*/
+		list-style-image: url("../images/category-content.png") !important;
+	}
+
+	#category-application > .category-icon {
+/*应用程序*/
+		list-style-image: url("../images/category-application.png") !important;
+	}
+
+	#category-privacy > .category-icon {
+/*隐私*/
+		list-style-image: url("../images/category-privacy.png") !important;
+	}
+
+	#category-security > .category-icon {
+/*安全*/
+		list-style-image: url("../images/category-security.png") !important;
+	}
+
+	#category-sync > .category-icon {
+/*同步*/
+		list-style-image: url("../images/category-sync.png") !important;
+	}
+
+	#category-advanced > .category-icon {
+/*高级*/
+		list-style-image: url("../images/category-advanced.png") !important;
+	}
+/*隐藏更新按钮*/
+#checkForUpdatesButton {display: none !important;}
+}
+
+
+
+
+
+
+
+
+

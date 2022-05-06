@@ -1,0 +1,111 @@
+@-moz-document url-prefix(chrome://mozapps/content/extensions/aboutaddons.html), url(about:addons),url-prefix(about:addons) {
+/*========列表 .list========*/
+/*列表所有项目放到同一行*/
+	#main .card {
+		margin: 8px auto !important;
+		position: relative !important;
+	}
+	
+
+	#main .card .addon-description {
+		font-size: 13px !important;
+	}
+
+	#main .card .addon-name{
+		font-size: 13px !important;
+	}
+	
+	
+  addon-card:not([expanded="true"]) .card-heading-icon {
+	  margin-inline-end: 2px !important;
+	}
+
+  addon-card:not([expanded="true"]) .card-heading-image {
+	  display: none !important;
+	}
+	
+
+  [class="toggle-button extension-enable-button"] {
+    margin-right:14px !important;
+  }
+
+  addon-list panel-item {
+    margin: -2px 4px 0 4px  !important;
+  }
+	
+  panel-list [data-l10n-id="preferences-addon-button"] {
+    margin: -20px 8px 0 0px  !important;
+  }
+	
+  panel-list [data-l10n-id="remove-addon-button"] {
+    margin: -3px 8px 0 20px  !important;
+  }
+  
+  panel-item-separator {
+    display: none !important;
+  }
+
+  [role="menuitem"]
+	{
+		background: transparent !important;
+	}
+	 
+	
+/*列表按钮*/
+	.addon.addon-view .status-control-wrapper {
+		position: absolute !important;
+		right: 12px;
+		top: -1px;
+	}
+	
+/*列表图标大小*/
+	#main .card .addon-icon {
+	height: 16px !important;
+	width: 16px !important;
+	margin-right:10px !important;
+	}
+
+/*隐藏拓展描述*/
+	addon-card:not([expanded]) .addon-description,
+  addon-card:not([expanded]) .addon-card-message button[action]{ display: none !important; }
+
+	
+/*显示描述信息*/
+	.addon.addon-view:hover .description-outer-container {
+/*选中*/
+		display: -moz-box !important;
+	}
+
+	.addon.addon-view[pending] .pending {
+/*禁用*/
+		margin-left: 0 !important;
+	}
+
+	.addon.addon-view[selected][pending] .pending {
+/*选中并禁用*/
+		margin-left: -1px !important;
+	}
+
+	.addon.addon-view[pending] .description-outer-container {
+/*禁用*/
+		display: none !important;
+	}
+
+/*选项背景*/
+	#view-port .addon {
+		background: #fff !important;
+	}
+/*悬停项背景*/
+	#view-port .addon:hover {
+		background: #d8f4e5 !important;
+	}
+/*禁用项背景*/
+	.addon.addon-view[active="false"]:not([notification="warning"] ) {
+		background: rgb(255,255,255) !important
+	}
+/*选中项背景*/
+	#view-port .addon[selected] {
+		background-color: #d8f4e5 !important;
+	}
+	
+}

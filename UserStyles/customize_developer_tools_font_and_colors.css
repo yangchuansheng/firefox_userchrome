@@ -1,0 +1,11 @@
+:root.theme-light {
+	--monospace-font-family: JetBrains Mono !important;
+	
+	--theme-highlight-blue: #0000FF !important;
+	--theme-highlight-purple: #FF0000 !important;
+	--theme-highlight-red: #000088 !important;
+	
+	--markup-hidden-tag-color: #5f82d9 !important;
+	--markup-hidden-attr-name-color: #888888 !important;
+	--markup-hidden-attr-value-colord: #d86060 !important;
+}
