@@ -453,7 +453,7 @@
     -moz-box-align: center !important;
     display: block !important;
     /* 调整 urlbar 位置 */
-    margin: 2.3px 0px !important;
+    margin: 1px 0px !important;
     top: 2px !important;
     color: inherit !important;
     block-size: border-block !important;
@@ -481,7 +481,7 @@
 #searchbar[focused] {
     border: 2px solid var(--toolbar-field-focus-border-color) !important;
     padding: 0 !important;
-    margin: 2.3px 0px !important;
+    margin: 1px 0px !important;
 }
 
 /* if only focused, don't break out the urlbar */
