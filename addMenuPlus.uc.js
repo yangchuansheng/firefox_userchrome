@@ -15,7 +15,7 @@
 // @ohomepageURL   https://github.com/Griever/userChromeJS/tree/master/addMenu
 // @reviewURL      http://bbs.kafan.cn/thread-1554431-1-1.html
 // @downloadURL    https://github.com/ywzhaiqi/userChromeJS/raw/master/addmenuPlus/addMenuPlus.uc.js
-// @note           0.1.3 还原不知道被谁删掉的配置文件路径配置项，修复 openCommand bug，修复 exec 目录读取图标报错，修复标签操作报错
+// @note           0.1.3 还原不知道被谁删掉的配置文件路径配置项，修复 openCommand bug，修复 exec 目录读取图标报错，修复标签操作报错，修复 app 菜单添加一级菜单（二级菜单还空没修）
 // @note           0.1.2 增加多语言，修复 %I %IMAGE_URL% %IMAGE_BASE64% 转换为空白字符串 this.t is not function，GroupMenu 增加 onshowing 事件
 // @note           0.1.1 Places keywords API を使うようにした
 // @note           0.1.0 menugroup をとりあえず利用できるようにした
@@ -279,9 +279,10 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
             ins = $("prefSep") || $("webDeveloperMenu");
             ins.parentNode.insertBefore(
                 $C("menuseparator", { id: "addMenu-tool-insertpoint", class: "addMenu-insert-point" }), ins.nextSibling);
-            ins = $("appmenu-quit") || $("menu_FileQuitItem");
+            PanelUI._initialized || PanelUI.init(shouldSuppressPopupNotifications);
+            ins = $("appmenu-quit") || $("appMenu-quit-button") || $("appMenu-quit-button2") || $("menu_FileQuitItem");
             ins.parentNode.insertBefore(
-                $C("menuseparator", { id: "addMenu-app-insertpoint", class: "addMenu-insert-point" }), ins);
+                $C(ins.localName === "toolbarbutton" ? "toolbarseparator" : "menuseparator", { id: "addMenu-app-insertpoint", class: "addMenu-insert-point" }), ins);
             ins = $("devToolsSeparator");
             ins.parentNode.insertBefore($C("menuitem", {
                 id: "addMenu-rebuild",
@@ -290,10 +291,13 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 oncommand: "setTimeout(function(){ addMenu.rebuild(true); }, 10);",
                 onclick: "if (event.button == 2) { event.preventDefault(); addMenu.edit(addMenu.FILE); }",
             }), ins);
-
+            this.panelInitialized = false;
             $("contentAreaContextMenu").addEventListener("popupshowing", this, false);
             $("tabContextMenu").addEventListener("popupshowing", this, false);
             $("menu_ToolsPopup").addEventListener("popupshowing", this, false);
+
+
+            PanelUI.mainView.addEventListener("ViewShowing", this.moveToAppMenu, { once: true });
 
             this.style = addStyle(css);
             this.rebuild();
@@ -309,8 +313,8 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
             $$('#addMenu-rebuild, .addMenu-insert-point').forEach(function (e) {
                 e.parentNode.removeChild(e)
             });
-            if (this.style && this.style.parentNode) this.style.parentNode.removeChild(this.style);
-            if (this.style2 && this.style2.parentNode) this.style2.parentNode.removeChild(this.style2);
+            if (this.style) removeStyle(this.style);
+            if (this.style2) removeStyle(this.style2);
         },
         handleEvent: function (event) {
             let that = this;
@@ -337,6 +341,13 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                         if (gContextMenu.onVideo || gContextMenu.onAudio)
                             state.push("media");
                         event.currentTarget.setAttribute("addMenu", state.join(" "));
+
+
+                        state.length > 0 && event.target.querySelectorAll(
+                            state.map(s => `.addMenu[condition~="${s}"]`).join(', ')
+                        ).forEach(m => {
+                            m.hidden = false;
+                        });
 
                         this.customShowings.forEach(function (obj) {
                             var curItem = obj.item;
@@ -411,7 +422,12 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 } catch (e) {
                     let aAllowThirdPartyFixup = {
                         postData: postData || null,
-                        triggeringPrincipal: Services.scriptSecurityManager.createNullPrincipal({})
+                        triggeringPrincipal: where === 'current' ?
+                            gBrowser.selectedBrowser.contentPrincipal : (
+                                /^(f|ht)tps?:/.test(uri.spec) ?
+                                    Services.scriptSecurityManager.createNullPrincipal({}) :
+                                    Services.scriptSecurityManager.getSystemPrincipal()
+                            )
                     }
                     openUILinkIn(uri.spec, where, aAllowThirdPartyFixup);
                 }
@@ -420,11 +436,12 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                     openNewTabWith(uri.spec);
                 } else {
                     let aAllowThirdPartyFixup = {
-                        inBackground: true,
                         postData: postData || null,
-                        triggeringPrincipal: Services.scriptSecurityManager.createNullPrincipal({})
+                        triggeringPrincipal: /^(f|ht)tps?:/.test(uri.spec) ?
+                            Services.scriptSecurityManager.createNullPrincipal({}) :
+                            Services.scriptSecurityManager.getSystemPrincipal()
                     }
-                    gBrowser.addTab(uri.spec, aAllowThirdPartyFixup);
+                    openUILinkIn(uri.spec, 'tab', aAllowThirdPartyFixup);
                 }
             } else {
                 // 可能是 78 以后改调用了，不记得了
@@ -479,6 +496,22 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                     return ffdir + path;
                 } else {
                     return path;
+                }
+            }
+        },
+        moveToAppMenu: async function (_e) {
+            let ins = document.getElementById('addMenu-app-insertpoint');
+            if (ins?.localName === 'menuseparator') {
+                let separator = $('appMenu-quit-button2').previousSibling;
+                if (separator) {
+                    ins.remove();
+                    // addMenu.removeMenuitem();
+                    ins = $C('toolbarseparator', {
+                        'id': 'addMenu-app-insertpoint'
+                    });
+                    separator.parentNode.insertBefore(ins, separator);
+                    addMenu.panelInitialized = true;
+                    addMenu.rebuild();
                 }
             }
         },
@@ -559,8 +592,8 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 });
                 return this.log(e);
             }
-            if (this.style2 && this.style2.parentNode)
-                this.style2.parentNode.removeChild(this.style2);
+            if (this.style2)
+                removeStyle(this.style2);
             if (sandbox._css.length)
                 this.style2 = addStyle(sandbox._css.join("\n"));
             this.removeMenuitem();
@@ -676,24 +709,28 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         newMenuitem: function (obj, opt) {
             opt || (opt = {});
 
-            var menuitem;
+            var menuitem,
+                isAppMenu = this.panelInitialized && opt.insertPoint?.id === 'addMenu-app-insertpoint',
+                separatorType = isAppMenu ? "toolbarseparator" : "menuseparator",
+                menuitemType = isAppMenu ? "toolbarbutton" : "menuitem";
+
             // label == separator か必要なプロパティが足りない場合は区切りとみなす
             if (obj.label === "separator" ||
                 (!obj.label && !obj.image && !obj.text && !obj.keyword && !obj.url && !obj.oncommand && !obj.command)) {
-                menuitem = document.createXULElement("menuseparator");
+                menuitem = document.createXULElement(separatorType);
             } else if (obj.oncommand || obj.command) {
                 let org = obj.command ? document.getElementById(obj.command) : null;
-                if (org && org.localName === "menuseparator") {
-                    menuitem = document.createXULElement("menuseparator");
+                if (org && org.localName === separatorType) {
+                    menuitem = document.createXULElement(separatorType);
                 } else {
-                    menuitem = document.createXULElement("menuitem");
+                    menuitem = document.createXULElement(menuitemType);
                     if (obj.command)
                         menuitem.setAttribute("command", obj.command);
                     if (!obj.label)
                         obj.label = obj.command || obj.oncommand;
                 }
             } else {
-                menuitem = document.createXULElement("menuitem");
+                menuitem = document.createXULElement(menuitemType);
                 // property fix
                 if (!obj.label)
                     obj.label = obj.exec || obj.keyword || obj.url || obj.text;
@@ -756,8 +793,12 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         }**/
             var cls = menuitem.classList;
             cls.add("addMenu");
-            cls.add("menuitem-iconic");
 
+            if (isAppMenu) {
+                cls.add("subviewbutton");
+            } else {
+                cls.add("menuitem-iconic");
+            }
             // 表示 / 非表示の設定
             if (obj.condition)
                 this.setCondition(menuitem, obj.condition);
@@ -788,7 +829,6 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         createMenuitem: function (itemArray, insertPoint) {
 
             var chldren = $A(insertPoint.parentNode.children);
-
             //Symbol.iterator
             for (let obj of itemArray) {
 
@@ -842,7 +882,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 }
 
 
-                menuitem = obj._items ? this.newMenu(obj) : this.newMenuitem(obj, { isTopMenuitem: true });
+                menuitem = obj._items ? this.newMenu(obj) : this.newMenuitem(obj, { isTopMenuitem: true, insertPoint: insertPoint });
 
                 insertMenuItem(obj, menuitem);
 
@@ -899,7 +939,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                     menu.setAttribute("disabled", "true");
                 } else {
                     if (aFile.isFile()) {
-                        let fileURL = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler).getURLSpecFromFile(aFile);
+                        let fileURL = this.getURLSpecFromFile(aFile);
                         menu.setAttribute("image", "moz-icon://" + fileURL + "?size=16");
                     } else {
                         menu.setAttribute("image", "chrome://global/skin/icons/folder.svg");
@@ -947,7 +987,6 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
             }).catch(e => { });
         },
         setCondition: function (menu, condition) {
-
             if (/\bnormal\b/i.test(condition)) {
                 menu.setAttribute("condition", "normal");
             } else {
@@ -1148,6 +1187,17 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 return elem.value.substring(elem.selectionStart, elem.selectionEnd);
             return "";
         },
+        getURLSpecFromFile(aFile) {
+            var aURL;
+            if (typeof userChrome !== "undefined" && typeof userChrome.getURLSpecFromFile !== "undefined") {
+                aURL = userChrome.getURLSpecFromFile(aFile);
+            } else if (this.appVersion < 92) {
+                aURL = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler).getURLSpecFromFile(aFile);
+            } else {
+                aURL = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler).getURLSpecFromActualFile(aFile);
+            }
+            return aURL;
+        },
         edit: function (aFile, aLineNumber) {
             if (!aFile || !aFile.exists() || !aFile.isFile()) return;
 
@@ -1183,13 +1233,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
                 }
             }
 
-            var aURL = "";
-            if (typeof userChrome !== "undefined") {
-                aURL = userChrome.getURLSpecFromFile(aFile);
-            } else {
-                var fph = Services.io.getProtocolHandler("file").QueryInterface(Ci.nsIFileProtocolHandler);
-                aURL = fph.getURLSpecFromActualFile(aFile);
-            }
+            var aURL = this.getURLSpecFromFile(aFile);
 
             var aDocument = null;
             var aCallBack = null;
@@ -1264,7 +1308,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
             } : null;
             var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
             alertsService.showAlertNotification(
-                "chrome://global/skin/icons/information-32.png", aTitle || "addMenu",
+                this.appVersion >= 78 ? "chrome://global/skin/icons/info.svg" : "chrome://global/skin/icons/information-32.png", aTitle || "addMenu",
                 aMsg + "", !!callback, "", callback);
         },
         $$: function (exp, context, aPartly) {
@@ -1281,7 +1325,16 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         log: log,
     };
 
-    window.addMenu.init();
+    if (gBrowserInit.delayedStartupFinished) window.addMenu.init();
+    else {
+        let delayedListener = (subject, topic) => {
+            if (topic == "browser-delayed-startup-finished" && subject == window) {
+                Services.obs.removeObserver(delayedListener, topic);
+                window.addMenu.init();
+            }
+        };
+        Services.obs.addObserver(delayedListener, "browser-delayed-startup-finished");
+    }
 
     function $(id) {
         return document.getElementById(id);
@@ -1346,14 +1399,24 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         return data;
     }
 
+    const sss = Components.classes["@mozilla.org/content/style-sheet-service;1"].getService(Components.interfaces.nsIStyleSheetService);
+
     function addStyle(css) {
-        var pi = document.createProcessingInstruction(
-            'xml-stylesheet',
-            'type="text/css" href="data:text/css;utf-8,' + encodeURIComponent(css) + '"'
-        );
-        return document.insertBefore(pi, document.documentElement);
+        let style = {
+            url: Services.io.newURI('data:text/css;charset=UTF-8,' + encodeURIComponent(`
+            @-moz-document url('chrome://browser/content/browser.xhtml') {
+                ${css}
+            }
+          `)),
+            type: 1
+        }
+        sss.loadAndRegisterSheet(style.url, style.type);
+        return style;
     }
 
+    function removeStyle(style) {
+        sss.unregisterSheet(style.url, style.type);
+    }
 
     function saveFile(fileOrName, data) {
         var file;
@@ -1374,85 +1437,86 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function (css
         foStream.close();
     }
 
-})('\
-.addMenuHide\
-  { display: none !important; }\
-\
-#contentAreaContextMenu:not([addMenu~="select"]) .addMenu[condition~="select"],\
-#contentAreaContextMenu:not([addMenu~="link"])   .addMenu[condition~="link"],\
-#contentAreaContextMenu:not([addMenu~="mailto"]) .addMenu[condition~="mailto"],\
-#contentAreaContextMenu:not([addMenu~="image"])  .addMenu[condition~="image"],\
-#contentAreaContextMenu:not([addMenu~="canvas"])  .addMenu[condition~="canvas"],\
-#contentAreaContextMenu:not([addMenu~="media"])  .addMenu[condition~="media"],\
-#contentAreaContextMenu:not([addMenu~="input"])  .addMenu[condition~="input"],\
-#contentAreaContextMenu[addMenu~="select"] .addMenu[condition~="noselect"],\
-#contentAreaContextMenu[addMenu~="link"]   .addMenu[condition~="nolink"],\
-#contentAreaContextMenu[addMenu~="mailto"] .addMenu[condition~="nomailto"],\
-#contentAreaContextMenu[addMenu~="image"]  .addMenu[condition~="noimage"],\
-#contentAreaContextMenu[addMenu~="canvas"]  .addMenu[condition~="nocanvas"],\
-#contentAreaContextMenu[addMenu~="media"]  .addMenu[condition~="nomedia"],\
-#contentAreaContextMenu[addMenu~="input"]  .addMenu[condition~="noinput"],\
-#contentAreaContextMenu:not([addMenu=""])  .addMenu[condition~="normal"]\
-  { display: none; }\
-\
-.addMenu-insert-point\
-  { display: none !important; }\
-\
-\
-.addMenu[url] {\
-  list-style-image: url("chrome://mozapps/skin/places/defaultFavicon.png");\
-}\
-\
-.addMenu.exec,\
-.addMenu[exec] {\
-  list-style-image: url("chrome://browser/skin/aboutSessionRestore-window-icon.png");\
-}\
-\
-.addMenu.copy,\
-menuitem.addMenu[text]:not([url]):not([keyword]):not([exec])\
-{\
-  list-style-image: url(data:image/png;base64,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);\
-  -moz-image-region: rect(0pt, 32px, 16px, 16px);\
-}\
-\
-.addMenu.checkbox .menu-iconic-icon {\
-  -moz-appearance: checkbox;\
-}\
-\
-.addMenu > .menu-iconic-left {\
-  -moz-appearance: menuimage;\
-}\
-\
-menugroup.addMenu {\
-  padding-bottom: 2px;\
-}\
-\
-menugroup.addMenu > .menuitem-iconic {\
-  -moz-box-flex: 1;\
-  -moz-box-pack: center;\
-  -moz-box-align: center;\
-  padding-block: 0.5em; \
-  padding-inline-start: 1em; \
-}\
-menugroup.addMenu > .menuitem-iconic > .menu-iconic-left {\
-  -moz-appearance: none;\
-  padding-top: 2px;\
-}\
-menugroup.addMenu > .menuitem-iconic > .menu-iconic-left > .menu-iconic-icon {\
-  width: 16px;\
-  height: 16px;\
-}\
-menugroup.addMenu:not(.showText):not(.showFirstText) > .menuitem-iconic:not(.showText) > .menu-iconic-text,\
-menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child) > .menu-iconic-text,\
-menugroup.addMenu > .menuitem-iconic > .menu-accel-container {\
-  display: none;\
-}\
-menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child):not(.showText) { \
-    padding-left: 0;\
-    -moz-box-flex: 0; \
-}\
-menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child):not(.showText) > .menu-iconic-left { \
-    margin-inline-start: 8px; \
-    margin-inline-end: 8px; \
-}\
-');
+})(`
+.addMenuHide
+  { display: none !important; }
+#contentAreaContextMenu:not([addMenu~="select"]) .addMenu[condition~="select"],
+#contentAreaContextMenu:not([addMenu~="link"])   .addMenu[condition~="link"],
+#contentAreaContextMenu:not([addMenu~="mailto"]) .addMenu[condition~="mailto"],
+#contentAreaContextMenu:not([addMenu~="image"])  .addMenu[condition~="image"],
+#contentAreaContextMenu:not([addMenu~="canvas"])  .addMenu[condition~="canvas"],
+#contentAreaContextMenu:not([addMenu~="media"])  .addMenu[condition~="media"],
+#contentAreaContextMenu:not([addMenu~="input"])  .addMenu[condition~="input"],
+#contentAreaContextMenu[addMenu~="select"] .addMenu[condition~="noselect"],
+#contentAreaContextMenu[addMenu~="link"]   .addMenu[condition~="nolink"],
+#contentAreaContextMenu[addMenu~="mailto"] .addMenu[condition~="nomailto"],
+#contentAreaContextMenu[addMenu~="image"]  .addMenu[condition~="noimage"],
+#contentAreaContextMenu[addMenu~="canvas"]  .addMenu[condition~="nocanvas"],
+#contentAreaContextMenu[addMenu~="media"]  .addMenu[condition~="nomedia"],
+#contentAreaContextMenu[addMenu~="input"]  .addMenu[condition~="noinput"],
+#contentAreaContextMenu:not([addMenu=""])  .addMenu[condition~="normal"]
+  { display: none; }
+.addMenu-insert-point
+  { display: none !important; }
+.addMenu[url] {
+  list-style-image: url("chrome://mozapps/skin/places/defaultFavicon.png");
+}
+.addMenu.exec,
+.addMenu[exec] {
+  list-style-image: url("chrome://browser/skin/aboutSessionRestore-window-icon.png");
+}
+.addMenu.copy,
+menuitem.addMenu[text]:not([url]):not([keyword]):not([exec])
+{
+  list-style-image: url(data:image/png;base64,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);
+  -moz-image-region: rect(0pt, 32px, 16px, 16px);
+}
+
+.addMenu.checkbox .menu-iconic-icon {
+  -moz-appearance: checkbox;
+}
+
+.addMenu > .menu-iconic-left {
+  -moz-appearance: menuimage;
+}
+menugroup.addMenu {
+  padding-bottom: 2px;
+}
+menugroup.addMenu > .menuitem-iconic.fixedSize {
+    -moz-box-flex: 0;
+}
+menugroup.addMenu > .menuitem-iconic.noIcon > .menu-iconic-left {
+    display: none !important;
+}
+menugroup.addMenu > .menuitem-iconic {
+  -moz-box-flex: 1;
+  -moz-box-pack: center;
+  -moz-box-align: center;
+  padding-block: 0.5em;
+  padding-inline-start: 1em; 
+}
+menugroup.addMenu > .menuitem-iconic > .menu-iconic-left {
+  -moz-appearance: none;
+  padding-top: 2px;
+}
+menugroup.addMenu > .menuitem-iconic > .menu-iconic-left > .menu-iconic-icon {
+  width: 16px;
+  height: 16px;
+}
+menugroup.addMenu:not(.showText):not(.showFirstText) > .menuitem-iconic:not(.showText) > .menu-iconic-text,
+menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child) > .menu-iconic-text,
+menugroup.addMenu > .menuitem-iconic > .menu-accel-container {
+  display: none;
+}
+menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child):not(.showText) {
+    padding-left: 0;
+    -moz-box-flex: 0;
+}
+menugroup.addMenu.showFirstText > .menuitem-iconic:not(:first-child):not(.showText) > .menu-iconic-left {
+    margin-inline-start: 8px;
+    margin-inline-end: 8px;
+}
+#addMenu-app-insertpoint+toolbarseparator {
+    display: none;
+}
+`);
