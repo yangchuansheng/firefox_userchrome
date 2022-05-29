@@ -38,14 +38,14 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function () {
                 var menu = this.cachedMenus[i];
                 if (menu && menu._x_inited) {
                     menu._x_scrollbox.width = '';
-                    if( menu._scrollBox && menu._scrollBox.style){
+                    if (menu._scrollBox && menu._scrollBox.style) {
                         menu._scrollBox.style.maxHeight = "";
                     }
-                    
+
                     menu.style.maxWidth = "";
 
                     var container = menu._x_box;
-                    if(container){
+                    if (container) {
                         container.style.minHeight = "";
                         container.style.height = "";
                         container.style.display = "";
@@ -74,13 +74,13 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function () {
             if (!menupopup._x_inited || !menupopup._x_scrollbox.scrollWidth) {
                 var scrollbox = menupopup._scrollBox;
 
-                var firstMenu = menupopup.firstChild;
-                while (firstMenu) {
-                    if (firstMenu.tagName == "menuitem") break;
-                    firstMenu = firstMenu.nextSibling;
-                }
+                var firstMenu = menupopup.querySelectorAll('.bookmark-item')[0];
+                // while (firstMenu) {
+                //     if (firstMenu.tagName == "menuitem") break;
+                //     firstMenu = firstMenu.nextSibling;
+                // }
 
-                
+
                 //var box = firstMenu.boxObject.parentBox;
                 var box = firstMenu.parentElement._scrollBox.scrollbox;
 
@@ -93,7 +93,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function () {
                     }
                 }
                 var container = menupopup._x_box;
-                if(container){
+                if (container) {
                     container.style.minHeight = "21px";
                     container.style.height = "auto";
                     container.style.display = "inline-flex";
@@ -109,7 +109,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function () {
                 while (menuitem) {
                     if (!menuitem.style.maxWidth) {
                         menuitem.style.maxWidth = "300px";
-                        menuitem.style.minWidth = "140px";
+                        menuitem.style.minWidth = "160px";
                     }
                     menuitem = menuitem.previousSibling;
                 }
@@ -117,7 +117,7 @@ location.href.startsWith('chrome://browser/content/browser.x') && (function () {
                     menupopup._x_scrollbox.width = menupopup._x_box.scrollWidth;
                 }
             }
-            
+
         }
     }
     BMMultiColumn.init();
