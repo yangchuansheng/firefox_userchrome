@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name            Status Bar
+// @name            status-bar.uc.js
+// @description     状态栏
 // @author          xiaoxiaoflood
 // @include         main
 // @startup         UC.statusBar.exec(win);
 // @shutdown        UC.statusBar.destroy();
+// @homepageURL     https://github.com/xiaoxiaoflood/firefox-scripts/
 // @onlyonce
 // ==/UserScript==
-
-const { CustomizableUI, StatusPanel } = window;
 
 UC.statusBar = {
   PREF_ENABLED: 'userChromeJS.statusbar.enabled',
@@ -56,7 +56,7 @@ UC.statusBar = {
 
     let dummystatusbar = _uc.createElement(document, 'toolbar', {
       id: 'status-dummybar',
-      toolbarname: 'Status Bar',
+      toolbarname: '状态栏',
       hidden: 'true'
     });
     dummystatusbar.collapsed = !this.enabled;
@@ -152,20 +152,18 @@ UC.statusBar = {
       type: _uc.sss.USER_SHEET
     }
   },
-  
-  destroy: function () {
-    const { CustomizableUI } = Services.wm.getMostRecentBrowserWindow();
 
+  destroy: function () {
     xPref.removeListener(this.enabledListener);
     xPref.removeListener(this.textListener);
     CustomizableUI.unregisterArea('status-bar');
     _uc.sss.unregisterSheet(this.STYLE.url, this.STYLE.type);
     _uc.windows((doc, win) => {
-      const { eval, statusbar, StatusPanel } = win;
-      eval('Object.defineProperty(StatusPanel, "_label", {' + this.orig.replace(/^set _label/, 'set') + ', enumerable: true, configurable: true});');
+      win.eval('Object.defineProperty(StatusPanel, "_label", {' + this.orig.replace(/^set _label/, 'set') + ', enumerable: true, configurable: true});');
+      let StatusPanel = win.StatusPanel;
       StatusPanel.panel.firstChild.appendChild(StatusPanel._labelElement);
       doc.getElementById('status-dummybar').remove();
-      statusbar.node.remove();
+      win.statusbar.node.remove();
     });
     Services.obs.removeObserver(this, 'browser-delayed-startup-finished');
     delete UC.statusBar;
