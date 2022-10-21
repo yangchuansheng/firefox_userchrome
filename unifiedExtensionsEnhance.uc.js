@@ -4,7 +4,7 @@
 // Once Firefox has implemented the functionality, the script can be removed.
 // @author          Ryan
 // @include         main
-// @version         0.1.2
+// @version         0.1.3
 // @compatibility   Firefox 104
 // @shutdown        window.unifiedExtensionsEnhance.destroy()
 // @homepageURL     https://github.com/benzBrake/FirefoxCustomize
@@ -27,6 +27,9 @@
             delete this.sss;
             return this.sss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
         },
+        get showDisabled() {
+            return Services.prefs.getBoolPref("extensions.unifiedExtensions.showDisabled", true);
+        },
         STYLE: {
             url: Services.io.newURI('data:text/css;charset=UTF-8,' + encodeURIComponent(`
             #unified-extensions,
@@ -41,61 +44,25 @@
                 overflow-y: scroll;
             }
             unified-extensions-item.no-options .unified-extensions-item-name {
-                color: color-mix(in srgb, currentColor 50%, transparent);
+                color: var(--menu-disabled-color, var(--panel-disabled-color));
             }
             unified-extensions-item.disabled .unified-extensions-item-name {
                 font-style: italic;
             }`)),
         },
         init: function () {
-            if (!gUnifiedExtensions) {
+            if (!Services.prefs.getBoolPref('extensions.unifiedExtensions.enabled', false) || !gUnifiedExtensions) {
                 return;
             }
-            CustomizableUI.createWidget({
-                id: 'movable-unified-extensions',
-                type: "view",
-                viewId: "unified-extensions-view",
-                defaultArea: CustomizableUI.AREA_NAVBAR,
-                localized: false,
-                onCreated: node => this.initButton(node)
-                ,
-                // onViewShowing: async event => {
-                //     let { ownerDocument: document } = event.target;
-                //     if (!gUnifiedExtensions._listView) {
-                //         gUnifiedExtensions._listView = PanelMultiView.getViewNode(
-                //             document,
-                //             "unified-extensions-view"
-                //         );
-                //         gUnifiedExtensions._listView.addEventListener("ViewShowing", unifiedExtensionsEnhance);
-                //         gUnifiedExtensions._listView.addEventListener("click", unifiedExtensionsEnhance);
-                //         gUnifiedExtensions._listView.addEventListener("ViewHiding", gUnifiedExtensions);
-
-                //         if (unifiedExtensionsEnhance.appVersion == 104)
-                //             gUnifiedExtensions._listView.classList.add('scroll');
-
-                //         // Lazy-load the l10n strings.
-                //         if (document
-                //             .getElementById("unified-extensions-context-menu"))
-                //             document
-                //                 .getElementById("unified-extensions-context-menu")
-                //                 .querySelectorAll("[data-lazy-l10n-id]")
-                //                 .forEach(el => {
-                //                     el.setAttribute(
-                //                         "data-l10n-id",
-                //                         el.getAttribute("data-lazy-l10n-id")
-                //                     )
-                //                         ;
-                //                     el.removeAttribute("data-lazy-l10n-id");
-                //                 });
-                //     }
-                //     if (gUnifiedExtensions._listView.getAttribute('visible') === "true") {
-                //         PanelMultiView.hidePopup(gUnifiedExtensions._listView.closest("panel"));
-                //     } else {
-                //         await PanelUI.showSubView("unified-extensions-view", event.target, event);
-                //         unifiedExtensionsEnhance.onViewShowing(gUnifiedExtensions._listView);
-                //     }
-                // }
-            });
+            if (!CustomizableUI.getPlacementOfWidget("movable-unified-extensions", true))
+                CustomizableUI.createWidget({
+                    id: 'movable-unified-extensions',
+                    type: "view",
+                    viewId: "unified-extensions-view",
+                    defaultArea: CustomizableUI.AREA_NAVBAR,
+                    localized: false,
+                    onCreated: node => this.initButton(node)
+                });
             if (gUnifiedExtensions.togglePanel.length === 2 && !gUnifiedExtensions.togglePanel.toString().includes("UnifiedExtensionsTogglePanel")) {
                 gUnifiedExtensions.togglePanel = async function (anchor, aEvent) {
                     if (anchor.getAttribute("open") == "true") {
@@ -144,18 +111,24 @@
                     view.addEventListener('ViewShowing', unifiedExtensionsEnhance);
             }
         },
-        handleEvent: function (event) {
+        handleEvent: async function (event) {
             if (event.type === "ViewShowing") {
                 this.onViewShowing(event);
             }
+            if (event.target.id === "unified-extensions-disable-all") {
+                let extensions = await gUnifiedExtensions.getActiveExtensions();
+                for (let extension of extensions)
+                    extension.disable();
+            }
         },
-
         onViewShowing: async function (event) {
             let { ownerDocument: document } = view = event.target;
-            if ((await gUnifiedExtensions.getActiveExtensions()).length === 0) {
+            if ((await gUnifiedExtensions.getActiveExtensions()).length == 0) {
                 await BrowserOpenAddonsMgr("addons://discover/");
+                view.closest("panel").hidePopup();
                 return;
             }
+            if (this.appVersion == 104) view.classList.add("scroll");
             if ($('unified-extensions-context-menu', document))
                 $('unified-extensions-context-menu', document)
                     .querySelectorAll("[data-lazy-l10n-id]")
@@ -170,28 +143,48 @@
                     });
             view.addEventListener('click', this.onClick);
 
+            let list = $Q('.unified-extensions-list', view);
+            $QA('unified-extensions-item', list).forEach(item => {
+                $R(item);
+            })
+            $R($Q('.generated-separator', list))
+            let extensions = await this.getAllExtensions(),
+                prevState;
 
-            let list = view.querySelector(".unified-extensions-list");
-            let extensions = await gUnifiedExtensions.getActiveExtensions();
-
-            for (const extension of extensions) {
-                if (unifiedExtensionsEnhance.appVersion > 104) {
-                    const item = document.createElement("unified-extensions-item");
-                    if (!extension.optionsURL) {
-                        item.classList.add('no-options');
-                    }
-                    item.setAddon(extension);
-                    list.appendChild(item);
-                } else {
-                    $QA('unified-extensions-item', list).forEach(item => {
-                        if (!item.addon.optionsURL)
-                            item.classList.add('no-options');
-                    })
+            extensions.sort((a, b) => {
+                let ka = (a.isActive ? '0' : '1') + a.name.toLowerCase();
+                let kb = (b.isActive ? '0' : '1') + b.name.toLowerCase();
+                return (ka < kb) ? -1 : 1;
+            }).forEach(addon => {
+                if (this.showDisabled && prevState && prevState != addon.isActive) {
+                    list.appendChild($C(document, 'toolbarseparator', { class: 'generated-separator' }));
                 }
+                prevState = addon.isActive;
+                const item = document.createElement("unified-extensions-item");
+                if (!addon.optionsURL) {
+                    item.classList.add('no-options');
+                }
+                item.setAddon(addon);
+                list.appendChild(item);
+            });
+            $QA('unified-extensions-item', list).forEach(item => {
+                if (!item.addon.optionsURL)
+                    item.classList.add('no-options');
+                if (!item.addon.isActive)
+                    item.classList.add('disabled');
+            })
+            if (!$Q("#unified-extensions-disable-all", view)) {
+                let disableAll = view.insertBefore($C(document, 'toolbarbutton', {
+                    id: 'unified-extensions-disable-all',
+                    class: "subviewbutton",
+                    label: "Disable all extensions",
+                }), $Q("#unified-extensions-manage-extensions", view));
+                disableAll.addEventListener('click', this);
             }
         },
         onClick: function (event) {
-            var { addon } = vbox = getParentOfLocalName(event.target, 'unified-extensions-item');
+            if (!event.target.closest('unified-extensions-item')) return;
+            var { addon } = vbox = event.target.closest('unified-extensions-item');
             var { classList } = event.target;
             if (classList.contains('unified-extensions-item-action') || classList.contains('unified-extensions-item-contents') || classList.contains('unified-extensions-item-name') || classList.contains('unified-extensions-item-message') || classList.contains('unified-extensions-item-icon')) {
                 switch (event.button) {
@@ -211,6 +204,14 @@
                         break;
                 }
             }
+        },
+        getAllExtensions: async function (event) {
+            let addons = await AddonManager.getAddonsByTypes(["extension"]);
+            addons = addons.filter(addon => !addon.hidden);
+            if (!this.showDisabled) {
+                addons = addons.filter(addon => addon.isActive);
+            }
+            return addons;
         },
         openAddonOptions: function (addon, win) {
             if (!addon.isActive || !addon.optionsURL)
@@ -241,6 +242,18 @@
         destroy: function () {
             this.sss.unregisterSheet(this.STYLE.url, this.STYLE.type);
             CustomizableUI.destroyWidget('movable-unified-extensions');
+            let view = PanelMultiView.getViewNode(
+                document,
+                "unified-extensions-view"
+            );
+            if (view) {
+                let list = $Q('.unified-extensions-list', view);
+                $QA('unified-extensions-item', list).forEach(item => {
+                    $R(item);
+                })
+                $R($Q('.generated-separator', list))
+                $R($Q("unified-extensions-disable-all", view));
+            }
             delete window.unifiedExtensionsEnhance;
         }
     }
@@ -278,41 +291,9 @@
         return el;
     }
 
-    function uAlert(aMsg, aTitle, aCallback) {
-        var callback = aCallback ? {
-            observe: function (subject, topic, data) {
-                if ("alertclickcallback" != topic)
-                    return;
-                aCallback.call(null);
-            }
-        } : null;
-        var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
-        alertsService.showAlertNotification("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSJjb250ZXh0LWZpbGwiIGZpbGwtb3BhY2l0eT0iY29udGV4dC1maWxsLW9wYWNpdHkiPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48cGF0aCBkPSJNMTIgMjJDNi40NzcgMjIgMiAxNy41MjMgMiAxMlM2LjQ3NyAyIDEyIDJzMTAgNC40NzcgMTAgMTAtNC40NzcgMTAtMTAgMTB6bTAtMmE4IDggMCAxIDAgMC0xNiA4IDggMCAwIDAgMCAxNnpNMTEgN2gydjJoLTJWN3ptMCA0aDJ2NmgtMnYtNnoiLz48L3N2Zz4=", aTitle || "unifiedExtensionsEnhance",
-            aMsg + "", !!callback, "", callback);
-    }
-
-    function getParentOfLocalName(el, localName) {
-        if (el == document) return;
-        if (el.localName == localName) return el;
-        return getParentOfLocalName(el.parentNode, localName);
-    }
-
-    const SSS = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
-
-    function addStyle(css, type = 0) {
-        let STYLE = {
-            url: Services.io.newURI('data:text/css;charset=UTF-8,' + encodeURIComponent(css)), type: type
-        }
-        SSS.loadAndRegisterSheet(STYLE.url, STYLE.type);
-        return STYLE;
-    }
-
-    function removeStyle(style) {
-        if (style && style.url && style.type) {
-            SSS.unregisterSheet(style.url, style.type);
-            return true;
-        }
-        return false;
+    function $R(el) {
+        if (!el || !el.parentNode) return;
+        el.parentNode.removeChild(el);
     }
 
     if (gBrowserInit.delayedStartupFinished) window.unifiedExtensionsEnhance.init();

@@ -25,6 +25,12 @@ toolbarbutton#scrollbutton-down{ background-color: transparent !important; borde
 .close-icon{ fill-opacity: 0 !important; }
 
 /* Glow effects on hover */
+#userContext-icons:hover,
+.urlbar-icon:hover:not([disabled]),
+#page-action-buttons > toolbarbutton:hover:not([disabled]),
+.searchbar-search-button:hover,
+#identity-box:hover:not(.no-hover),
+#tracking-protection-icon-container:hover #tracking-protection-icon-box,
 .close-icon:hover,
 .urlbar-history-dropmarker:hover,
 #page-action-buttons > .urlbar-icon:hover,
@@ -43,6 +49,7 @@ toolbarbutton#scrollbutton-down:not([disabled]):hover{
 }
 
 /* Active states and close window button hover state */
+#userContext-icons:active,
 #titlebar .titlebar-buttonbox > .titlebar-close:hover > .toolbarbutton-icon,
 .close-icon:active,
 .urlbar-history-dropmarker:active,

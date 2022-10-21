@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Extension Options Panel
-// @version        1.8.3
+// @version        1.8.7
 // @author         aminomancer
 // @homepage       https://github.com/aminomancer/uc.css.js
 // @description    This script creates a toolbar button that opens a popup panel
@@ -132,9 +132,10 @@ class ExtensionOptionsWidget {
    * @returns the DOM node
    */
   setAttributes(el, props) {
-    for (let [name, value] of Object.entries(props))
+    for (let [name, value] of Object.entries(props)) {
       if (value) el.setAttribute(name, value);
       else el.removeAttribute(name);
+    }
   }
 
   /**
@@ -186,8 +187,9 @@ class ExtensionOptionsWidget {
    * @returns {string} url
    */
   getScreenshotUrlForAddon(addon) {
-    if (addon.id == "default-theme@mozilla.org")
+    if (addon.id == "default-theme@mozilla.org") {
       return "chrome://mozapps/content/extensions/default-theme/preview.svg";
+    }
     const builtInThemePreview = this.BuiltInThemes.previewForBuiltInThemeId(addon.id);
     if (builtInThemePreview) return builtInThemePreview;
     let { screenshots } = addon;
@@ -207,7 +209,7 @@ class ExtensionOptionsWidget {
       ExtensionPermissions: "resource://gre/modules/ExtensionPermissions.jsm",
       BuiltInThemes: "resource:///modules/BuiltInThemes.jsm",
     });
-    XPCOMUtils.defineLazyGetter(this, "extBundle", function () {
+    XPCOMUtils.defineLazyGetter(this, "extBundle", function() {
       return Services.strings.createBundle("chrome://global/locale/extensions.properties");
     });
     XPCOMUtils.defineLazyPreferenceGetter(
@@ -228,7 +230,7 @@ class ExtensionOptionsWidget {
     if (
       /^chrome:\/\/browser\/content\/browser.(xul||xhtml)$/i.test(location) &&
       !CustomizableUI.getPlacementOfWidget("eom-button", true)
-    )
+    ) {
       CustomizableUI.createWidget({
         id: "eom-button",
         viewId: this.viewId,
@@ -280,20 +282,23 @@ class ExtensionOptionsWidget {
           );
 
           // create the theme preview tooltip
-          aDoc
-            .getElementById("mainPopupSet")
-            .appendChild(
-              aDoc.defaultView.MozXULElement.parseXULToFragment(
-                `<tooltip id="eom-theme-preview-tooltip" noautohide="true" orient="vertical" onpopupshowing="extensionOptionsPanel.onTooltipShowing(event);"><vbox id="eom-theme-preview-box"><html:img id="eom-theme-preview-canvas"></html:img></vbox></tooltip>`
-              )
-            );
+          if (eop.config["Show theme preview tooltips"]) {
+            aDoc
+              .getElementById("mainPopupSet")
+              .appendChild(
+                aDoc.defaultView.MozXULElement.parseXULToFragment(
+                  `<tooltip id="eom-theme-preview-tooltip" noautohide="true" orient="vertical" onpopupshowing="extensionOptionsPanel.onTooltipShowing(event);"><vbox id="eom-theme-preview-box"><html:img id="eom-theme-preview-canvas"></html:img></vbox></tooltip>`
+                )
+              );
+          }
 
           eop.fluentSetup(aDoc).then(() => eop.swapAddonsButton(aDoc));
         },
         // populate the panel before it's shown
         onViewShowing: event => {
-          if (event.originalTarget === event.target.ownerGlobal.extensionOptionsPanel?.panelview)
+          if (event.originalTarget === event.target.ownerGlobal.extensionOptionsPanel?.panelview) {
             event.target.ownerGlobal.extensionOptionsPanel.getAddonsAndPopulate(event);
+          }
         },
         // delete the panel if the widget node is destroyed
         onDestroyed: aDoc => {
@@ -304,6 +309,7 @@ class ExtensionOptionsWidget {
           }
         },
       });
+    }
     this.loadStylesheet(); // load the stylesheet
   }
 
@@ -374,15 +380,16 @@ class ExtensionOptionsWidget {
     let blackListArray = this.config["Addon ID blacklist"];
 
     // clear all the panel items and subviews before rebuilding them.
-    while (body.hasChildNodes()) body.removeChild(body.firstChild);
+    while (body.hasChildNodes()) body.firstChild.remove();
     [...this.viewCache(doc).children].forEach(panel => {
       if (panel.id.includes("PanelUI-eom-addon-")) panel.remove();
     });
     let appMenuMultiView = win.PanelMultiView.forNode(PanelUI.multiView);
-    if (win.PanelMultiView.forNode(view.closest("panelmultiview")) === appMenuMultiView)
+    if (win.PanelMultiView.forNode(view.closest("panelmultiview")) === appMenuMultiView) {
       [...appMenuMultiView._viewStack.children].forEach(panel => {
         if (panel.id !== view.id && panel.id.includes("PanelUI-eom-addon-")) panel.remove();
       });
+    }
 
     // extensions...
     let enabledSubheader = body.appendChild(
@@ -392,8 +399,8 @@ class ExtensionOptionsWidget {
     extensions
       .sort((a, b) => {
         // get sorted by enabled state...
-        let ka = (enabledFirst ? (a.isActive ? "0" : "1") : "") + a.name.toLowerCase();
-        let kb = (enabledFirst ? (b.isActive ? "0" : "1") : "") + b.name.toLowerCase();
+        let ka = (enabledFirst ? Number(!a.isActive) : "") + a.name.toLowerCase();
+        let kb = (enabledFirst ? Number(!b.isActive) : "") + b.name.toLowerCase();
         return ka < kb ? -1 : 1;
       })
       .forEach(addon => {
@@ -538,43 +545,48 @@ class ExtensionOptionsWidget {
     };
 
     let message = null;
-    if (addon.blocklistState === STATE_BLOCKED)
+    if (addon.blocklistState === STATE_BLOCKED) {
       message = {
-        label: l10n.addonMessages["Blocked"],
+        label: l10n.addonMessages.Blocked,
         detail: await formatString("blocked", { name }),
         type: "error",
       };
-    else if (this.isDisabledUnsigned(addon))
+    } else if (this.isDisabledUnsigned(addon)) {
       message = {
         label: l10n.addonMessages["Signature Required"],
         detail: await formatString("unsigned-and-disabled", { name }),
         type: "error",
       };
-    else if (
+    } else if (
       !addon.isCompatible &&
       (AddonManager.checkCompatibility || addon.blocklistState !== STATE_SOFTBLOCKED)
-    )
+    ) {
       message = {
-        label: l10n.addonMessages["Incompatible"],
+        label: l10n.addonMessages.Incompatible,
         detail: await formatString("incompatible", {
           name,
           version: Services.appinfo.version,
         }),
         type: "warning",
       };
-    else if (!this.isCorrectlySigned(addon))
+    } else if (!this.isCorrectlySigned(addon)) {
       message = {
-        label: l10n.addonMessages["Unverified"],
+        label: l10n.addonMessages.Unverified,
         detail: await formatString("unsigned", { name }),
         type: "warning",
       };
-    else if (addon.blocklistState === STATE_SOFTBLOCKED)
+    } else if (addon.blocklistState === STATE_SOFTBLOCKED) {
       message = {
-        label: l10n.addonMessages["Insecure"],
+        label: l10n.addonMessages.Insecure,
         detail: await formatString("softblocked", { name }),
         type: "warning",
       };
-    if (addon.type === "theme" && (!message || message.type !== "error")) {
+    }
+    if (
+      this.config["Show theme preview tooltips"] &&
+      addon.type === "theme" &&
+      (!message || message.type !== "error")
+    ) {
       message = message ?? {};
       message.detail = "";
       message.tooltip = "eom-theme-preview-tooltip";
@@ -597,12 +609,13 @@ class ExtensionOptionsWidget {
       subviewbutton.setAttribute("tooltiptext", message?.detail);
       if (message.tooltip) subviewbutton.setAttribute("tooltip", message.tooltip);
       if (message.checked) subviewbutton.setAttribute("enable-checked", true);
-      if (message.label)
+      if (message.label) {
         subviewbutton.appendChild(
           this.create(document, "h", {
             class: "toolbarbutton-text eom-message-label",
           })
         ).textContent = `(${message.label})`;
+      }
     }
     subviewbutton._addonMessage = message;
   }
@@ -689,10 +702,11 @@ class ExtensionOptionsWidget {
       })
     );
     uninstallButton.addEventListener("command", e => {
-      if (win.Services.prompt.confirm(null, null, `Delete ${addon.name} permanently?`))
+      if (win.Services.prompt.confirm(null, null, `Delete ${addon.name} permanently?`)) {
         addon.pendingOperations & win.AddonManager.PENDING_UNINSTALL
           ? addon.cancelUninstall()
           : addon.uninstall();
+      }
     });
 
     // allow automatic updates radio group
@@ -851,8 +865,9 @@ class ExtensionOptionsWidget {
       let PMV = view.panelMultiView && win.PanelMultiView.forNode(view.panelMultiView);
       if (PMV) {
         let panel = PMV._panel;
-        if (panel && PMV._getBoundsWithoutFlushing(panel.anchorNode)?.width)
+        if (panel && PMV._getBoundsWithoutFlushing(panel.anchorNode)?.width) {
           win.CustomHint?.show(panel.anchorNode, "Copied");
+        }
       }
     });
 
@@ -906,8 +921,9 @@ class ExtensionOptionsWidget {
           }
         }
         let features = "chrome,titlebar,toolbar,centerscreen";
-        if (win.Services.prefs.getBoolPref("browser.preferences.instantApply"))
+        if (win.Services.prefs.getBoolPref("browser.preferences.instantApply")) {
           features += ",dialog=no";
+        }
         win.openDialog(addon.optionsURL, addon.id, features);
     }
   }
@@ -932,6 +948,8 @@ class ExtensionOptionsWidget {
       e.preventDefault();
       return;
     }
+    e.target.setAttribute("position", "after_start");
+    e.target.moveToAnchor(anchor, "after_start");
   }
 
   // generate and load a stylesheet
@@ -1036,7 +1054,7 @@ class ExtensionOptionsWidget {
     content: url(chrome://global/skin/icons/check.svg);
     fill: currentColor;
     fill-opacity: 0.6;
-    display: -moz-box;
+    display: block;
     margin-inline-start: 10px;
 }
 #eom-theme-preview-tooltip {

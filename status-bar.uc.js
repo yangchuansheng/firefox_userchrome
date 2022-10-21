@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name            status-bar.uc.js
-// @description     状态栏
+// @name            Status Bar
 // @author          xiaoxiaoflood
 // @include         main
 // @startup         UC.statusBar.exec(win);
 // @shutdown        UC.statusBar.destroy();
-// @homepageURL     https://github.com/xiaoxiaoflood/firefox-scripts/
 // @onlyonce
 // ==/UserScript==
+
+const { CustomizableUI, StatusPanel } = window;
 
 UC.statusBar = {
   PREF_ENABLED: 'userChromeJS.statusbar.enabled',
@@ -38,7 +38,7 @@ UC.statusBar = {
         if (isEnabled)
           win.statusbar.textNode.appendChild(StatusPanel._labelElement);
         else
-          StatusPanel.panel.firstChild.appendChild(StatusPanel._labelElement);
+          StatusPanel.panel.appendChild(StatusPanel._labelElement);
       });
     });
 
@@ -56,7 +56,7 @@ UC.statusBar = {
 
     let dummystatusbar = _uc.createElement(document, 'toolbar', {
       id: 'status-dummybar',
-      toolbarname: '状态栏',
+      toolbarname: 'Status Bar',
       hidden: 'true'
     });
     dummystatusbar.collapsed = !this.enabled;
@@ -68,7 +68,7 @@ UC.statusBar = {
         if (value === true) {
           xPref.set(UC.statusBar.PREF_ENABLED, false);
           win.statusbar.node.setAttribute('collapsed', true);
-          StatusPanel.panel.firstChild.appendChild(StatusPanel._labelElement);
+          StatusPanel.panel.appendChild(StatusPanel._labelElement);
           win.statusbar.node.parentNode.collapsed = true;;
         } else {
           xPref.set(UC.statusBar.PREF_ENABLED, true);
@@ -144,6 +144,13 @@ UC.statusBar = {
             flex-direction: column !important;
             -moz-window-dragging: drag;
           }
+          toolbarpaletteitem #status-text:before {
+            content: "Status text";
+            color: red;
+            border: 1px #aaa solid;
+            border-radius: 3px;
+            font-weight: bold;
+          }
           #browser-bottombox:not([collapsed]) {
             border-top: 1px solid var(--panel-separator-color) !important;
           }
@@ -152,18 +159,20 @@ UC.statusBar = {
       type: _uc.sss.USER_SHEET
     }
   },
-
+  
   destroy: function () {
+    const { CustomizableUI } = Services.wm.getMostRecentBrowserWindow();
+
     xPref.removeListener(this.enabledListener);
     xPref.removeListener(this.textListener);
     CustomizableUI.unregisterArea('status-bar');
     _uc.sss.unregisterSheet(this.STYLE.url, this.STYLE.type);
     _uc.windows((doc, win) => {
-      win.eval('Object.defineProperty(StatusPanel, "_label", {' + this.orig.replace(/^set _label/, 'set') + ', enumerable: true, configurable: true});');
-      let StatusPanel = win.StatusPanel;
-      StatusPanel.panel.firstChild.appendChild(StatusPanel._labelElement);
+      const { eval, statusbar, StatusPanel } = win;
+      eval('Object.defineProperty(StatusPanel, "_label", {' + this.orig.replace(/^set _label/, 'set') + ', enumerable: true, configurable: true});');
+      StatusPanel.panel.appendChild(StatusPanel._labelElement);
       doc.getElementById('status-dummybar').remove();
-      win.statusbar.node.remove();
+      statusbar.node.remove();
     });
     Services.obs.removeObserver(this, 'browser-delayed-startup-finished');
     delete UC.statusBar;

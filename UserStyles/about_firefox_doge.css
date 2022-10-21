@@ -1,7 +1,7 @@
 @-moz-document url("chrome://browser/content/aboutDialog.xhtml") {
         /* change logo png, svg, even gif anims */
 	#leftBox {
-		background-image: url("https://jsdelivr.fuckcloudnative.io/gh/yangchuansheng/imghosting1@main/img/20210505152049.png") !important;
+		background-image: url("https://jsdelivr.icloudnative.io/gh/yangchuansheng/imghosting1@main/img/20210505152049.png") !important;
 		background-position: left !important;
 		background-repeat: no-repeat !important;
 		font-family: Roboto, "LXGW WenKai", sans-serif !important;
