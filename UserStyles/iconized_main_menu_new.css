@@ -209,46 +209,6 @@ See the above repository for updates as well as full license text. */
 }
 
 
-  /* Panel - More tools */
-  #appmenu-moreTools-button {
-    list-style-image: url(chrome://browser/skin/customize.svg);
-  }
-  
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(1) {  /* Web Developer Tools */
-    list-style-image: url(../icons/developer.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(2) {  /* Task Manager */
-    list-style-image: url(../icons/performance.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(3) {  /* Remote Debugging - Edge bug.svg */
-    list-style-image: url(../icons/bug.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(4) {  /* Browser Toolbox - Edge webdeveloper.svg */
-    list-style-image: url(chrome://devtools/skin/images/tool-debugger.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(5) {  /* Browser Content Toolbaox -  */
-    list-style-image: url(../icons/command-frames.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(6) {  /* Browser Console */
-    list-style-image: url(chrome://devtools/skin/images/command-console.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(7) {  /* Responsive Design Mode */
-    list-style-image: url(../icons/command-responsivemode.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(8) {  /* Eyedropper */
-    list-style-image: url(chrome://devtools/skin/images/command-eyedropper.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(9) {  /* Page Source - Edge file-search.svg */
-    list-style-image: url(../icons/search.svg);
-  }
-  #appmenu-developer-tools-view  .subviewbutton:nth-child(10) { /* Extensions for Devel */
-    list-style-image: url(chrome://devtools/skin/images/debugging-addons.svg);
-  }
-  #appmenu-developer-tools-view .subviewbutton:last-child {
-    margin-bottom: 6px !important;
-  }
-
-
 /** Context Menu - Icons ******************************************************/
 /*= tabContextMenu ===========================================================*/
 #context_openANewTab {
@@ -1384,3 +1344,198 @@ menuitem.privatetab-icon {
 #torBrowserUserManual {
   --menuitem-image: url("chrome://browser/skin/onion.svg");
 }
+
+
+/** 帮助 Start */
+#appMenu-help-button2 {
+    list-style-image: url("chrome://global/skin/icons/help.svg");
+}
+
+#appMenu_menu_openHelp {
+    list-style-image: url("chrome://global/skin/icons/help.svg");
+}
+
+#appMenu_feedbackPage {
+    list-style-image: url("../icons/sync/send.svg");
+}
+
+#appMenu_helpSafeMode {
+    list-style-image: url("chrome://devtools/skin/images/debugging-workers.svg");
+}
+
+#appMenu_troubleShooting {
+    list-style-image: url("chrome://global/skin/icons/more.svg");
+}
+
+#appMenu_help_reportSiteIssue {
+    list-style-image: url("chrome://global/skin/icons/lightbulb.svg");
+}
+
+#appMenu_menu_HelpPopup_reportPhishingtoolmenu {
+    list-style-image: url("chrome://global/skin/icons/warning.svg");
+}
+
+#appMenu_aboutName {
+    list-style-image: url("chrome://global/skin/icons/info.svg");
+}
+
+#appMenu-advanced-settings-button {
+    list-style-image: url("chrome://global/skin/icons/settings.svg");
+}
+
+
+/** 历史 Start */
+#appMenu-history-button {
+    list-style-image: url("chrome://browser/skin/history.svg");
+}
+
+#appMenuRecentlyClosedTabs {
+    list-style-image: url("../icons/organizer/closed-tabs.svg");
+}
+
+#appMenuRecentlyClosedWindows {
+    list-style-image: url("../icons/organizer/closed-windows.svg");
+}
+
+#appMenuRestoreSession {
+    list-style-image: url("../icons/organizer/restore-session.svg");
+}
+
+#appMenu-restoreSession {
+    list-style-image: url("../icons/organizer/restore-session.svg");
+}
+
+#appMenuClearRecentHistory {
+    list-style-image: url("../icons/organizer/clean.svg");
+}
+
+#historyUndoPopup .restoreallitem {
+    background-image: url("../icons/organizer/reload.svg");
+}
+
+#PanelUI-historyMore {
+    list-style-image: url("chrome://browser/skin/history.svg");
+}
+
+/** 历史 End */
+
+
+/** 书签 Start */
+#appMenu-bookmarks-button {
+    list-style-image: url("../icons/organizer/book.svg");
+}
+
+#panelMenuBookmarkThisPage {
+    list-style-image: url("../icons/organizer/bookmark.svg");
+}
+
+#panelMenu_searchBookmarks {
+    list-style-image: url("chrome://global/skin/icons/search-glass.svg");
+}
+
+#panelMenu_viewBookmarksToolbar {
+    list-style-image: url("chrome://browser/skin/bookmarks-toolbar.svg");
+}
+
+#select-bookmark,
+#panelMenu_showAllBookmarks {
+    list-style-image: url("../icons/organizer/book.svg");
+}
+
+#BMB_viewBookmarksSidebar {
+    background-image: url("chrome://browser/skin/sidebars.svg");
+}
+
+#BMB_bookmarksShowAllTop {
+    background-image: url("../icons/organizer/bookmark.svg");
+}
+
+#BMB_viewBookmarksToolbar {
+    background-image: url("chrome://browser/skin/bookmarks-toolbar.svg");
+}
+
+.openintabs-menuitem {
+    background-image: url("../icons/organizer/open-all.svg");
+}
+
+#BMB_bookmarksShowAll {
+    background-image: url("../icons/organizer/bookmark.svg");
+}
+
+/** 书签 End */
+
+
+/** 更多 Start */
+#appMenu-more-button2 {
+    list-style-image: url("../icons/moretools/more.svg");
+}
+
+#appmenu-moreTools-button {
+    list-style-image: url("../icons/moretools/customize.svg");
+}
+
+/* Web Developer Tools */
+#appmenu-developer-tools-view .subviewbutton:nth-child(1),
+#PanelUI-developer-tools-view .subviewbutton:nth-child(1) {
+    list-style-image: url("../icons/moretools/developer.svg");
+}
+
+/* Task Manager */
+#appmenu-developer-tools-view .subviewbutton:nth-child(2),
+#PanelUI-developer-tools-view .subviewbutton:nth-child(2) {
+    list-style-image: url("chrome://global/skin/icons/performance.svg");
+}
+
+/* Remote Debugging - Edge bug.svg */
+#appmenu-developer-tools-view .subviewbutton:nth-child(3),
+#PanelUI-developer-tools-view .subviewbutton:nth-child(3) {
+    list-style-image: url("../icons/moretools/bug.svg");
+}
+
+/* Browser Toolbox - Edge webdeveloper.svg */
+#appmenu-developer-tools-view .subviewbutton:nth-child(4),
+#PanelUI-developer-tools-view .subviewbutton:nth-child(4) {
+    list-style-image: url("../icons/moretools/window-dev-tools.svg");
+}
+
+/* Browser Content Toolbaox -  */
+#appmenu-developer-tools-view .subviewbutton:nth-child(5),
+#PanelUI-developer-tools-view .subviewbutton:nth-child(5) {
+    list-style-image: url("../icons/moretools/command-frames.svg");
+}
+
+/* Browser Console */
+#appmenu-developer-tools-view .subviewbutton:nth-last-child(5),
+#PanelUI-developer-tools-view .subviewbutton:nth-last-child(5) {
+    list-style-image: url("chrome://devtools/skin/images/command-console.svg");
+}
+
+/* Responsive Design Mode */
+#appmenu-developer-tools-view .subviewbutton:nth-last-child(4),
+#PanelUI-developer-tools-view .subviewbutton:nth-last-child(4) {
+    list-style-image: url("../icons/moretools/command-responsivemode.svg");
+}
+
+/* Eyedropper */
+#appmenu-developer-tools-view .subviewbutton:nth-last-child(3),
+#PanelUI-developer-tools-view .subviewbutton:nth-last-child(3) {
+    list-style-image: url("chrome://devtools/skin/images/command-eyedropper.svg");
+}
+
+/* Page Source - Edge file-search.svg */
+#appmenu-developer-tools-view .subviewbutton:nth-last-child(2),
+#PanelUI-developer-tools-view .subviewbutton:nth-last-child(2) {
+    list-style-image: url("../icons/moretools/document-search.svg");
+}
+
+/* Extensions for Devel */
+#appmenu-developer-tools-view .subviewbutton:nth-last-child(1),
+#PanelUI-developer-tools-view .subviewbutton:nth-last-child(1) {
+    list-style-image: url("chrome://global/skin/icons/plugin.svg");
+}
+
+#appmenu-developer-tools-view .subviewbutton:last-child {
+    margin-bottom: 6px !important;
+}
+
+/** 更多 End */
